@@ -1,0 +1,54 @@
+# OS-specific files
+Thumbs.db
+.idea/
+*.iml
+*.ipr
+*.iws
+/out/
+
+# Build directories
+/build/
+.gradle/
+.gradle/*
+
+# Gradle Wrapper
+.gradle/wrapper/
+.gradle/wrapper/*
+
+# Java-specific files
+*.class
+*.log
+
+# IntelliJ IDEA files
+.idea/
+*.ipr
+*.iws
+*.iml
+.idea/workspace.xml
+.idea/misc.xml
+.idea/modules.xml
+.idea/.name
+.idea/libraries/
+.idea/runConfigurations/
+.idea/vcs.xml
+*.class
+
+# macOS-specific files
+.DS_Store
+._*
+
+# Windows-specific files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Log files
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
