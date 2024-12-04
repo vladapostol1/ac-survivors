@@ -2,11 +2,15 @@ package com.acsurvivors.entities.systems;
 
 import com.acsurvivors.entities.Entity;
 import com.acsurvivors.entities.EntityManager;
+import com.acsurvivors.entities.components.AnimatedSpriteComponent;
 import com.acsurvivors.entities.components.SpriteComponent;
 import com.acsurvivors.entities.components.TransformComponent;
 import com.acsurvivors.utils.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+
+import static com.acsurvivors.Main.TILE_SIZE;
 
 public class RenderingSystem {
     private final SpriteBatch batch;
@@ -26,13 +30,15 @@ public class RenderingSystem {
                 TransformComponent transform = entity.getComponent(TransformComponent.class);
                 SpriteComponent sprite = entity.getComponent(SpriteComponent.class);
 
-                batch.draw(sprite.texture, transform.x, transform.y,
-                    sprite.texture.getWidth() * transform.scaleX,
-                    sprite.texture.getHeight() * transform.scaleY);
+                batch.draw(sprite.texture,
+                    transform.x,
+                    transform.y,
+                    TILE_SIZE, TILE_SIZE);
             }
         }
         batch.end();
     }
+
 
     public void renderMap(String[][] mapData, int tileSize) {
         batch.begin();
