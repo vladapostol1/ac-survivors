@@ -5,6 +5,8 @@ import com.acsurvivors.entities.EntityManager;
 import com.acsurvivors.entities.components.SpriteComponent;
 import com.acsurvivors.entities.components.TransformComponent;
 import com.acsurvivors.entities.systems.RenderingSystem;
+import com.acsurvivors.utils.AssetManager;
+import com.acsurvivors.utils.MapLoader;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -14,26 +16,28 @@ public class Main extends ApplicationAdapter {
     private SpriteBatch batch;
     private EntityManager entityManager;
     private RenderingSystem renderingSystem;
+    private MapLoader mapLoader;
+    private AssetManager assetManager;
+
 
     @Override
     public void create() {
         batch = new SpriteBatch();
         entityManager = new EntityManager();
-        renderingSystem = new RenderingSystem(batch);
+        assetManager = new AssetManager();
+        mapLoader = new MapLoader(assetManager);
 
-        // Create an entity
-        Entity entity = entityManager.createEntity();
-        entity.addComponent(TransformComponent.class, new TransformComponent());
-        SpriteComponent spriteComponent = new SpriteComponent();
-        spriteComponent.texture = new Texture("libgdx.png");
-        entity.addComponent(SpriteComponent.class, spriteComponent);
+        assetManager.loadMapTextures("00");
+        mapLoader.loadMap("maps/test_ground.txt");
+        renderingSystem = new RenderingSystem(batch, assetManager);
     }
 
     @Override
     public void render() {
         ScreenUtils.clear(0f, 0f, 0f, 1f);
 
-        // Update and render
+        renderingSystem.renderMap(mapLoader.getMapData(), 32);
+
         renderingSystem.render(entityManager);
     }
 
