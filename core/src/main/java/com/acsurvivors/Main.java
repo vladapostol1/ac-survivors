@@ -2,10 +2,7 @@ package com.acsurvivors;
 
 import com.acsurvivors.entities.Entity;
 import com.acsurvivors.entities.EntityManager;
-import com.acsurvivors.entities.components.ColliderComponent;
-import com.acsurvivors.entities.components.SpriteComponent;
-import com.acsurvivors.entities.components.TransformComponent;
-import com.acsurvivors.entities.components.ControlComponent;
+import com.acsurvivors.entities.components.*;
 import com.acsurvivors.entities.systems.RenderingSystem;
 import com.acsurvivors.entities.systems.ControlSystem;
 import com.acsurvivors.utils.AssetManager;
@@ -51,12 +48,13 @@ public class Main extends ApplicationAdapter {
         mapLoader.loadMap("maps/test_ground.txt");
         assetManager.loadTexture("player_idle.png");
 
-        //Create player
+        //calc center of the map
         int mapWidth = mapLoader.getMapData()[0].length * 32;
         int mapHeight = mapLoader.getMapData().length * 32;
         int centerX = mapWidth / 2;
         int centerY = mapHeight / 2;
 
+        //Create player
         Entity player = entityManager.createEntity();
         TransformComponent transform = new TransformComponent();
         transform.x = centerX;
@@ -72,6 +70,12 @@ public class Main extends ApplicationAdapter {
 
         ColliderComponent collider = new ColliderComponent(transform.x, transform.y, TILE_SIZE / 2, TILE_SIZE / 2);
         player.addComponent(ColliderComponent.class, collider);
+
+        StatsComponent playerStats = new StatsComponent(10, 0, 1, 1,1);
+        player.addComponent(StatsComponent.class, playerStats);
+
+        LevelComponent playerLevel = new LevelComponent();
+        player.addComponent(LevelComponent.class, playerLevel);
 
         renderingSystem = new RenderingSystem(batch, assetManager);
 
