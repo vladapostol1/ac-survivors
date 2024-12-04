@@ -38,6 +38,14 @@ public class Main extends ApplicationAdapter {
 
         //Assets import
         assetManager.loadMapTextures("00");
+        assetManager.loadMapTextures("01");
+        assetManager.loadMapTextures("02");
+        assetManager.loadMapTextures("03");
+        assetManager.loadMapTextures("04");
+        assetManager.loadMapTextures("05");
+        assetManager.loadMapTextures("06");
+        assetManager.loadMapTextures("07");
+        assetManager.loadMapTextures("08");
         mapLoader.loadMap("maps/test_ground.txt");
         assetManager.loadTexture("player_idle.png");
 
