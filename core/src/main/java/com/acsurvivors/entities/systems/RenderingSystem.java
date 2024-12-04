@@ -2,13 +2,12 @@ package com.acsurvivors.entities.systems;
 
 import com.acsurvivors.entities.Entity;
 import com.acsurvivors.entities.EntityManager;
-import com.acsurvivors.entities.components.AnimatedSpriteComponent;
 import com.acsurvivors.entities.components.SpriteComponent;
 import com.acsurvivors.entities.components.TransformComponent;
 import com.acsurvivors.utils.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Matrix4;
 
 import static com.acsurvivors.Main.TILE_SIZE;
 
@@ -19,6 +18,10 @@ public class RenderingSystem {
     public RenderingSystem(SpriteBatch batch, AssetManager assetManager) {
         this.batch = batch;
         this.assetManager = assetManager;
+    }
+
+    public void setProjectionMatrix(Matrix4 projectionMatrix) {
+        batch.setProjectionMatrix(projectionMatrix);
     }
 
     public void render(EntityManager entityManager) {
@@ -39,7 +42,6 @@ public class RenderingSystem {
         batch.end();
     }
 
-
     public void renderMap(String[][] mapData, int tileSize) {
         batch.begin();
         for (int row = 0; row < mapData.length; row++) {
@@ -53,7 +55,4 @@ public class RenderingSystem {
         }
         batch.end();
     }
-
-
 }
-

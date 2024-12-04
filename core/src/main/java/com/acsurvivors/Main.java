@@ -76,13 +76,15 @@ public class Main extends ApplicationAdapter {
 
         //updates
         controlSystem.update(entityManager, delta);
-        Entity player = entityManager.getEntities().get(0); // Assuming the player is the first entity
+        Entity player = entityManager.getEntities().get(0);
         TransformComponent playerTransform = player.getComponent(TransformComponent.class);
         camera.setPosition(playerTransform.x + TILE_SIZE / 2, playerTransform.y + TILE_SIZE / 2);
+
         camera.getCamera().update();
 
+        renderingSystem.setProjectionMatrix(camera.getCamera().combined);
 
-        //renders
+        // Render the map and entities
         renderingSystem.renderMap(mapLoader.getMapData(), TILE_SIZE);
         renderingSystem.render(entityManager);
     }
