@@ -2,26 +2,32 @@ package com.acsurvivors.entities.systems;
 
 import com.acsurvivors.entities.Entity;
 import com.acsurvivors.entities.EntityManager;
+import com.acsurvivors.entities.components.ColliderComponent;
 import com.acsurvivors.entities.components.SpriteComponent;
 import com.acsurvivors.entities.components.TransformComponent;
 import com.acsurvivors.utils.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
 
-import static com.acsurvivors.Main.TILE_SIZE;
+import static com.acsurvivors.utils.Constants.DEBUG_MODE;
+import static com.acsurvivors.utils.Constants.TILE_SIZE;
 
 public class RenderingSystem {
     private final SpriteBatch batch;
     private final AssetManager assetManager;
+    private final ShapeRenderer shapeRenderer;
 
     public RenderingSystem(SpriteBatch batch, AssetManager assetManager) {
         this.batch = batch;
         this.assetManager = assetManager;
+        this.shapeRenderer = new ShapeRenderer();
     }
 
     public void setProjectionMatrix(Matrix4 projectionMatrix) {
         batch.setProjectionMatrix(projectionMatrix);
+        shapeRenderer.setProjectionMatrix(projectionMatrix);
     }
 
     public void render(EntityManager entityManager) {
@@ -36,10 +42,23 @@ public class RenderingSystem {
                 batch.draw(sprite.texture,
                     transform.x,
                     transform.y,
-                    TILE_SIZE, TILE_SIZE);
+                    TILE_SIZE / 2 , TILE_SIZE / 2);
             }
         }
         batch.end();
+
+        if (DEBUG_MODE) {
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+            shapeRenderer.setColor(0, 1, 0, 1);
+            for (Entity entity : entityManager.getEntities()) {
+                if (entity.hasComponent(ColliderComponent.class)) {
+                    ColliderComponent collider = entity.getComponent(ColliderComponent.class);
+                    shapeRenderer.rect(collider.bounds.x, collider.bounds.y,
+                        collider.bounds.width, collider.bounds.height);
+                }
+            }
+            shapeRenderer.end();
+        }
     }
 
     public void renderMap(String[][] mapData, int tileSize) {

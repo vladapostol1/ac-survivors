@@ -3,6 +3,7 @@ package com.acsurvivors.entities.systems;
 import com.acsurvivors.entities.Entity;
 import com.acsurvivors.entities.EntityManager;
 import com.acsurvivors.entities.components.ControlComponent;
+import com.acsurvivors.entities.components.ColliderComponent;
 import com.acsurvivors.entities.components.TransformComponent;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -25,6 +26,11 @@ public class ControlSystem {
 
                 transform.x += control.velocity.x * delta;
                 transform.y += control.velocity.y * delta;
+
+                if (entity.hasComponent(ColliderComponent.class)) {
+                    ColliderComponent collider = entity.getComponent(ColliderComponent.class);
+                    collider.updatePosition(transform.x, transform.y);
+                }
             }
         }
     }

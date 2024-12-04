@@ -2,6 +2,7 @@ package com.acsurvivors;
 
 import com.acsurvivors.entities.Entity;
 import com.acsurvivors.entities.EntityManager;
+import com.acsurvivors.entities.components.ColliderComponent;
 import com.acsurvivors.entities.components.SpriteComponent;
 import com.acsurvivors.entities.components.TransformComponent;
 import com.acsurvivors.entities.components.ControlComponent;
@@ -16,8 +17,9 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 
+import static com.acsurvivors.utils.Constants.TILE_SIZE;
+
 public class Main extends ApplicationAdapter {
-    public static final int TILE_SIZE = 64;
 
     private SpriteBatch batch;
     private EntityManager entityManager;
@@ -67,6 +69,9 @@ public class Main extends ApplicationAdapter {
         SpriteComponent sprite = new SpriteComponent();
         sprite.texture = assetManager.getTexture("player_idle.png");
         player.addComponent(SpriteComponent.class, sprite);
+
+        ColliderComponent collider = new ColliderComponent(transform.x, transform.y, TILE_SIZE / 2, TILE_SIZE / 2);
+        player.addComponent(ColliderComponent.class, collider);
 
         renderingSystem = new RenderingSystem(batch, assetManager);
 
