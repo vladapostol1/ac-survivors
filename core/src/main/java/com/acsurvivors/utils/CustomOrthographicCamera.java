@@ -4,6 +4,8 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
+import static com.acsurvivors.utils.Constants.TILE_SIZE;
+
 public class CustomOrthographicCamera {
     private final OrthographicCamera camera;
     private final Vector2 position;
@@ -35,7 +37,7 @@ public class CustomOrthographicCamera {
         float halfViewportWidth = camera.viewportWidth / 2f;
         float halfViewportHeight = camera.viewportHeight / 2f;
 
-        float buffer = 16f;
+        float buffer = TILE_SIZE / 2;
 
         if (worldWidth > 0 && worldHeight > 0) {
             position.x = Math.max(halfViewportWidth + buffer, Math.min(worldWidth - halfViewportWidth - buffer, position.x));
@@ -64,4 +66,3 @@ public class CustomOrthographicCamera {
         return new Vector2(worldCoords.x, worldCoords.y);
     }
 }
-

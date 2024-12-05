@@ -1,9 +1,16 @@
 package com.acsurvivors;
 
+import com.acsurvivors.entities.EnemySpawner;
 import com.acsurvivors.entities.Entity;
 import com.acsurvivors.entities.EntityManager;
 import com.acsurvivors.entities.components.*;
 import com.acsurvivors.utils.RenderingSystem;
+import com.acsurvivors.entities.components.ColliderComponent;
+import com.acsurvivors.entities.components.SpriteComponent;
+import com.acsurvivors.entities.components.TransformComponent;
+import com.acsurvivors.entities.components.ControlComponent;
+import com.acsurvivors.entities.systems.CollisionSystem;
+import com.acsurvivors.entities.systems.DebugRenderSystem;
 import com.acsurvivors.entities.systems.ControlSystem;
 import com.acsurvivors.utils.AssetManager;
 import com.acsurvivors.utils.CustomOrthographicCamera;
@@ -28,6 +35,11 @@ public class Main extends ApplicationAdapter {
     private AssetManager assetManager;
     private ControlSystem controlSystem;
     private CustomOrthographicCamera camera;
+    private DebugRenderSystem debugRenderSystem;
+    private EnemySpawner enemySpawner;
+    private CollisionSystem collisionSystem;
+    private float spawnTimer = 0;  // Timer pentru spawnare inamici
+    private static final float SPAWN_INTERVAL = 3f;
 
 
     @Override
@@ -60,6 +72,8 @@ public class Main extends ApplicationAdapter {
         int mapHeight = mapLoader.getMapData().length * 32;
         int centerX = mapWidth / 2;
         int centerY = mapHeight / 2;
+        System.out.println("centerX " + centerX);
+        System.out.println("centerX " + centerY);
 
         //Create player
         Entity player = entityManager.createEntity();
@@ -92,22 +106,25 @@ public class Main extends ApplicationAdapter {
         animatedSprite.setAnimation("idle");
 
         player.addComponent(AnimatedSpriteComponent.class, animatedSprite);
-        System.out.println("x: " + transform.x + " y: " + transform.y + " w/h: " + TILE_SIZE / 2 + " spriteW/H: " + TILE_SIZE / 2 * animatedSprite.scaleY);
-        ColliderComponent collider = new ColliderComponent(transform.x, transform.y, TILE_SIZE, TILE_SIZE);
+        ColliderComponent collider = new ColliderComponent(transform.x, transform.y, TILE_SIZE, TILE_SIZE, mapLoader);
         player.addComponent(ColliderComponent.class, collider);
 
-        StatsComponent playerStats = new StatsComponent(10, 0, 1, 1,1);
-        player.addComponent(StatsComponent.class, playerStats);
 
-        LevelComponent playerLevel = new LevelComponent();
-        player.addComponent(LevelComponent.class, playerLevel);
+        //Enemy
+
+
+        camera.setPosition(centerX, centerY);
 
         renderingSystem = new RenderingSystem(batch, assetManager);
 
-        //
-        controlSystem = new ControlSystem();
+        controlSystem = new ControlSystem(mapLoader);
+
+        debugRenderSystem = new DebugRenderSystem(mapLoader, camera);
 
         camera.setWorldBounds(mapWidth, mapHeight);
+        enemySpawner = new EnemySpawner(entityManager, assetManager, camera, mapLoader);
+
+
     }
 
     @Override
@@ -129,6 +146,13 @@ public class Main extends ApplicationAdapter {
         // Render the map and entities
         renderingSystem.renderMap(mapLoader.getMapData(), TILE_SIZE);
         renderingSystem.render(entityManager);
+
+        spawnTimer += delta;
+        if (spawnTimer >= SPAWN_INTERVAL) {
+            enemySpawner.spawnEnemyNearPlayer(playerTransform.x, playerTransform.y);
+            spawnTimer = 0;
+        }
+        //debugRenderSystem.render(entityManager);
     }
 
     @Override
@@ -138,7 +162,6 @@ public class Main extends ApplicationAdapter {
 
         // Dispose resources for all entities
         for (Entity entity : entityManager.getEntities()) {
-            // Handle SpriteComponent
             if (entity.hasComponent(SpriteComponent.class)) {
                 Texture texture = entity.getComponent(SpriteComponent.class).textureRegion.getTexture();
                 if (texture != null && !disposedTextures.contains(texture)) {
@@ -147,7 +170,6 @@ public class Main extends ApplicationAdapter {
                 }
             }
 
-            // Handle AnimatedSpriteComponent
             if (entity.hasComponent(AnimatedSpriteComponent.class)) {
                 AnimatedSpriteComponent animComponent = entity.getComponent(AnimatedSpriteComponent.class);
                 for (AnimatedSpriteComponent.Animation animation : animComponent.getAnimations().values()) {
@@ -162,7 +184,6 @@ public class Main extends ApplicationAdapter {
             }
         }
 
-        // Dispose resources in AssetManager
         assetManager.dispose();
     }
 }
