@@ -10,8 +10,12 @@ import com.acsurvivors.utils.CustomOrthographicCamera;
 import com.acsurvivors.utils.MapLoader;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.ScreenUtils;
+
+import java.util.HashSet;
 
 import static com.acsurvivors.utils.Constants.TILE_SIZE;
 
@@ -43,7 +47,13 @@ public class Main extends ApplicationAdapter {
         mapLoader.loadMap("maps/test_ground.txt");
 
         //Sprites
-        assetManager.loadTexture("player_idle", "sprites/player_idle.png");
+        assetManager.loadTexture("player_idle_1", "sprites/player/player_idle_1.png");
+        assetManager.loadTexture("player_idle_2", "sprites/player/player_idle_2.png");
+        assetManager.loadTexture("player_idle_3", "sprites/player/player_idle_3.png");
+        assetManager.loadTexture("player_idle_4", "sprites/player/player_idle_4.png");
+        assetManager.loadTexture("player_walk_1", "sprites/player/player_walk_1.png");
+        assetManager.loadTexture("player_walk_2", "sprites/player/player_walk_2.png");
+        assetManager.loadTexture("player_walk_3", "sprites/player/player_walk_3.png");
 
         //calc center of the map
         int mapWidth = mapLoader.getMapData()[0].length * 32;
@@ -61,11 +71,29 @@ public class Main extends ApplicationAdapter {
         ControlComponent control = new ControlComponent();
         player.addComponent(ControlComponent.class, control);
 
-        SpriteComponent sprite = new SpriteComponent();
-        sprite.texture = assetManager.getTexture("player_idle");
-        player.addComponent(SpriteComponent.class, sprite);
+        AnimatedSpriteComponent animatedSprite = new AnimatedSpriteComponent();
 
-        ColliderComponent collider = new ColliderComponent(transform.x, transform.y, TILE_SIZE / 2, TILE_SIZE / 2);
+        AnimatedSpriteComponent.Animation idleAnimation = new AnimatedSpriteComponent.Animation(1f);
+        idleAnimation.addFrame(new TextureRegion(assetManager.getTexture("player_idle_1")));
+        idleAnimation.addFrame(new TextureRegion(assetManager.getTexture("player_idle_2")));
+        idleAnimation.addFrame(new TextureRegion(assetManager.getTexture("player_idle_3")));
+        idleAnimation.addFrame(new TextureRegion(assetManager.getTexture("player_idle_4")));
+        animatedSprite.addAnimation("idle", idleAnimation);
+
+        AnimatedSpriteComponent.Animation walkAnimation = new AnimatedSpriteComponent.Animation(0.8f);
+        walkAnimation.addFrame(new TextureRegion(assetManager.getTexture("player_walk_1")));
+        walkAnimation.addFrame(new TextureRegion(assetManager.getTexture("player_walk_2")));
+        walkAnimation.addFrame(new TextureRegion(assetManager.getTexture("player_walk_3")));
+
+        animatedSprite.scaleX = 1.5f;
+        animatedSprite.scaleY = 1.5f;
+        animatedSprite.addAnimation("walk", walkAnimation);
+
+        animatedSprite.setAnimation("idle");
+
+        player.addComponent(AnimatedSpriteComponent.class, animatedSprite);
+        System.out.println("x: " + transform.x + " y: " + transform.y + " w/h: " + TILE_SIZE / 2 + " spriteW/H: " + TILE_SIZE / 2 * animatedSprite.scaleY);
+        ColliderComponent collider = new ColliderComponent(transform.x, transform.y, TILE_SIZE, TILE_SIZE);
         player.addComponent(ColliderComponent.class, collider);
 
         StatsComponent playerStats = new StatsComponent(10, 0, 1, 1,1);
@@ -106,10 +134,35 @@ public class Main extends ApplicationAdapter {
     @Override
     public void dispose() {
         batch.dispose();
+        HashSet<Texture> disposedTextures = new HashSet<>();
+
+        // Dispose resources for all entities
         for (Entity entity : entityManager.getEntities()) {
+            // Handle SpriteComponent
             if (entity.hasComponent(SpriteComponent.class)) {
-                entity.getComponent(SpriteComponent.class).texture.dispose();
+                Texture texture = entity.getComponent(SpriteComponent.class).textureRegion.getTexture();
+                if (texture != null && !disposedTextures.contains(texture)) {
+                    texture.dispose();
+                    disposedTextures.add(texture);
+                }
+            }
+
+            // Handle AnimatedSpriteComponent
+            if (entity.hasComponent(AnimatedSpriteComponent.class)) {
+                AnimatedSpriteComponent animComponent = entity.getComponent(AnimatedSpriteComponent.class);
+                for (AnimatedSpriteComponent.Animation animation : animComponent.getAnimations().values()) {
+                    for (TextureRegion frame : animation.frames) {
+                        Texture texture = frame.getTexture();
+                        if (texture != null && !disposedTextures.contains(texture)) {
+                            texture.dispose();
+                            disposedTextures.add(texture);
+                        }
+                    }
+                }
             }
         }
+
+        // Dispose resources in AssetManager
+        assetManager.dispose();
     }
 }

@@ -1,6 +1,12 @@
 libgdx.png
 maps/test_ground.txt
-sprites/player_idle.png
+sprites/player/player_idle_1.png
+sprites/player/player_idle_2.png
+sprites/player/player_idle_3.png
+sprites/player/player_idle_4.png
+sprites/player/player_walk_1.png
+sprites/player/player_walk_2.png
+sprites/player/player_walk_3.png
 tiles/00.png
 tiles/01.png
 tiles/02.png
