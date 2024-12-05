@@ -52,3 +52,6 @@ $RECYCLE.BIN/
 *.swp
 *.swo
 *~
+
+core/build/
+lwjgl3/build/

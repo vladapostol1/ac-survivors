@@ -8,6 +8,7 @@ import com.acsurvivors.entities.components.TransformComponent;
 import com.acsurvivors.utils.AssetManager;
 import com.acsurvivors.utils.CustomOrthographicCamera;
 import com.acsurvivors.utils.MapLoader;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 
@@ -57,17 +58,17 @@ public class EnemySpawner {
         transform.y = spawnY;
         enemy.addComponent(TransformComponent.class, transform);
 
-        SpriteComponent sprite = new SpriteComponent();
-        sprite.texture = assetManager.getTexture("player_idle.png");
+        SpriteComponent sprite = new SpriteComponent(new TextureRegion(assetManager.getTexture("player_idle_1")));
         enemy.addComponent(SpriteComponent.class, sprite);
 
-        ColliderComponent collider = new ColliderComponent(transform.x, transform.y, TILE_SIZE / 2, TILE_SIZE / 2, mapLoader);
+        ColliderComponent collider = new ColliderComponent(transform.x, transform.y, TILE_SIZE, TILE_SIZE, mapLoader);
         enemy.addComponent(ColliderComponent.class, collider);
         collider.updatePosition(transform.x, transform.y);
     }
+
     private boolean isCollidingWithOtherEnemies(float x, float y) {
         List<Entity> entities = entityManager.getEntities();
-        Rectangle newEnemyBounds = new Rectangle(x, y, TILE_SIZE / 2, TILE_SIZE / 2);
+        Rectangle newEnemyBounds = new Rectangle(x, y, TILE_SIZE, TILE_SIZE);
 
         for (Entity entity : entities) {
             if (entity.hasComponent(ColliderComponent.class)) {

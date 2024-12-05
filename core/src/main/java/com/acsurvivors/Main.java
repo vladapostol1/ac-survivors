@@ -3,13 +3,14 @@ package com.acsurvivors;
 import com.acsurvivors.entities.EnemySpawner;
 import com.acsurvivors.entities.Entity;
 import com.acsurvivors.entities.EntityManager;
+import com.acsurvivors.entities.components.*;
+import com.acsurvivors.utils.RenderingSystem;
 import com.acsurvivors.entities.components.ColliderComponent;
 import com.acsurvivors.entities.components.SpriteComponent;
 import com.acsurvivors.entities.components.TransformComponent;
 import com.acsurvivors.entities.components.ControlComponent;
 import com.acsurvivors.entities.systems.CollisionSystem;
 import com.acsurvivors.entities.systems.DebugRenderSystem;
-import com.acsurvivors.entities.systems.RenderingSystem;
 import com.acsurvivors.entities.systems.ControlSystem;
 import com.acsurvivors.utils.AssetManager;
 import com.acsurvivors.utils.CustomOrthographicCamera;
@@ -18,9 +19,10 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.ScreenUtils;
 
-import java.util.Random;
+import java.util.HashSet;
 
 import static com.acsurvivors.utils.Constants.TILE_SIZE;
 
@@ -46,24 +48,26 @@ public class Main extends ApplicationAdapter {
         entityManager = new EntityManager();
         assetManager = new AssetManager();
         mapLoader = new MapLoader(assetManager);
-        camera = new CustomOrthographicCamera(3000, 3000);
-        collisionSystem = new CollisionSystem();
+        camera = new CustomOrthographicCamera(640, 480);
 
         //Assets import
-        assetManager.loadMapTextures("00");
-        assetManager.loadMapTextures("01");
-        assetManager.loadMapTextures("02");
-        assetManager.loadMapTextures("03");
-        assetManager.loadMapTextures("04");
-        assetManager.loadMapTextures("05");
-        assetManager.loadMapTextures("06");
-        assetManager.loadMapTextures("07");
-        assetManager.loadMapTextures("08");
+        //Map tiles and map plan
+        String[] tiles_name = {"00","01","02","03","04","05","06","07","08"};
+        String[] tiles_path = {"tiles/00.png","tiles/01.png","tiles/02.png","tiles/03.png","tiles/04.png",
+            "tiles/05.png","tiles/06.png","tiles/07.png","tiles/08.png"};
+        assetManager.loadMultipleTextures(tiles_name, tiles_path);
         mapLoader.loadMap("maps/test_ground.txt");
-        assetManager.loadTexture("player_idle.png");
-        //assetManager.loadTexture("enemy1.png");
 
-        //Create player
+        //Sprites
+        assetManager.loadTexture("player_idle_1", "sprites/player/player_idle_1.png");
+        assetManager.loadTexture("player_idle_2", "sprites/player/player_idle_2.png");
+        assetManager.loadTexture("player_idle_3", "sprites/player/player_idle_3.png");
+        assetManager.loadTexture("player_idle_4", "sprites/player/player_idle_4.png");
+        assetManager.loadTexture("player_walk_1", "sprites/player/player_walk_1.png");
+        assetManager.loadTexture("player_walk_2", "sprites/player/player_walk_2.png");
+        assetManager.loadTexture("player_walk_3", "sprites/player/player_walk_3.png");
+
+        //calc center of the map
         int mapWidth = mapLoader.getMapData()[0].length * 32;
         int mapHeight = mapLoader.getMapData().length * 32;
         int centerX = mapWidth / 2;
@@ -71,7 +75,7 @@ public class Main extends ApplicationAdapter {
         System.out.println("centerX " + centerX);
         System.out.println("centerX " + centerY);
 
-        //Player
+        //Create player
         Entity player = entityManager.createEntity();
         TransformComponent transform = new TransformComponent();
         transform.x = centerX;
@@ -81,11 +85,28 @@ public class Main extends ApplicationAdapter {
         ControlComponent control = new ControlComponent();
         player.addComponent(ControlComponent.class, control);
 
-        SpriteComponent sprite = new SpriteComponent();
-        sprite.texture = assetManager.getTexture("player_idle.png");
-        player.addComponent(SpriteComponent.class, sprite);
+        AnimatedSpriteComponent animatedSprite = new AnimatedSpriteComponent();
 
-        ColliderComponent collider = new ColliderComponent(transform.x, transform.y, TILE_SIZE / 2, TILE_SIZE / 2, mapLoader);
+        AnimatedSpriteComponent.Animation idleAnimation = new AnimatedSpriteComponent.Animation(1f);
+        idleAnimation.addFrame(new TextureRegion(assetManager.getTexture("player_idle_1")));
+        idleAnimation.addFrame(new TextureRegion(assetManager.getTexture("player_idle_2")));
+        idleAnimation.addFrame(new TextureRegion(assetManager.getTexture("player_idle_3")));
+        idleAnimation.addFrame(new TextureRegion(assetManager.getTexture("player_idle_4")));
+        animatedSprite.addAnimation("idle", idleAnimation);
+
+        AnimatedSpriteComponent.Animation walkAnimation = new AnimatedSpriteComponent.Animation(0.8f);
+        walkAnimation.addFrame(new TextureRegion(assetManager.getTexture("player_walk_1")));
+        walkAnimation.addFrame(new TextureRegion(assetManager.getTexture("player_walk_2")));
+        walkAnimation.addFrame(new TextureRegion(assetManager.getTexture("player_walk_3")));
+
+        animatedSprite.scaleX = 1.5f;
+        animatedSprite.scaleY = 1.5f;
+        animatedSprite.addAnimation("walk", walkAnimation);
+
+        animatedSprite.setAnimation("idle");
+
+        player.addComponent(AnimatedSpriteComponent.class, animatedSprite);
+        ColliderComponent collider = new ColliderComponent(transform.x, transform.y, TILE_SIZE, TILE_SIZE, mapLoader);
         player.addComponent(ColliderComponent.class, collider);
 
 
@@ -117,7 +138,7 @@ public class Main extends ApplicationAdapter {
         Entity player = entityManager.getEntities().get(0);
         TransformComponent playerTransform = player.getComponent(TransformComponent.class);
         camera.setPosition(playerTransform.x + TILE_SIZE / 2, playerTransform.y + TILE_SIZE / 2);
-        camera.moveTo(playerTransform.x, playerTransform.y, delta);
+
         camera.getCamera().update();
 
         renderingSystem.setProjectionMatrix(camera.getCamera().combined);
@@ -137,10 +158,32 @@ public class Main extends ApplicationAdapter {
     @Override
     public void dispose() {
         batch.dispose();
+        HashSet<Texture> disposedTextures = new HashSet<>();
+
+        // Dispose resources for all entities
         for (Entity entity : entityManager.getEntities()) {
             if (entity.hasComponent(SpriteComponent.class)) {
-                entity.getComponent(SpriteComponent.class).texture.dispose();
+                Texture texture = entity.getComponent(SpriteComponent.class).textureRegion.getTexture();
+                if (texture != null && !disposedTextures.contains(texture)) {
+                    texture.dispose();
+                    disposedTextures.add(texture);
+                }
+            }
+
+            if (entity.hasComponent(AnimatedSpriteComponent.class)) {
+                AnimatedSpriteComponent animComponent = entity.getComponent(AnimatedSpriteComponent.class);
+                for (AnimatedSpriteComponent.Animation animation : animComponent.getAnimations().values()) {
+                    for (TextureRegion frame : animation.frames) {
+                        Texture texture = frame.getTexture();
+                        if (texture != null && !disposedTextures.contains(texture)) {
+                            texture.dispose();
+                            disposedTextures.add(texture);
+                        }
+                    }
+                }
             }
         }
+
+        assetManager.dispose();
     }
 }
