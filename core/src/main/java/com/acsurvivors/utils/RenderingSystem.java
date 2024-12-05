@@ -1,11 +1,10 @@
-package com.acsurvivors.entities.systems;
+package com.acsurvivors.utils;
 
 import com.acsurvivors.entities.Entity;
 import com.acsurvivors.entities.EntityManager;
 import com.acsurvivors.entities.components.ColliderComponent;
 import com.acsurvivors.entities.components.SpriteComponent;
 import com.acsurvivors.entities.components.TransformComponent;
-import com.acsurvivors.utils.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -66,7 +65,7 @@ public class RenderingSystem {
         for (int row = 0; row < mapData.length; row++) {
             for (int col = 0; col < mapData[row].length; col++) {
                 String tileKey = mapData[row][col];
-                Texture texture = assetManager.getTexture(tileKey + ".png");
+                Texture texture = assetManager.getTexture(tileKey);
                 if (texture != null) {
                     batch.draw(texture, col * tileSize, row * tileSize, tileSize, tileSize);
                 }

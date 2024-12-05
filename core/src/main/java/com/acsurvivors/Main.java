@@ -3,14 +3,13 @@ package com.acsurvivors;
 import com.acsurvivors.entities.Entity;
 import com.acsurvivors.entities.EntityManager;
 import com.acsurvivors.entities.components.*;
-import com.acsurvivors.entities.systems.RenderingSystem;
+import com.acsurvivors.utils.RenderingSystem;
 import com.acsurvivors.entities.systems.ControlSystem;
 import com.acsurvivors.utils.AssetManager;
 import com.acsurvivors.utils.CustomOrthographicCamera;
 import com.acsurvivors.utils.MapLoader;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 
@@ -36,17 +35,15 @@ public class Main extends ApplicationAdapter {
         camera = new CustomOrthographicCamera(640, 480);
 
         //Assets import
-        assetManager.loadMapTextures("00");
-        assetManager.loadMapTextures("01");
-        assetManager.loadMapTextures("02");
-        assetManager.loadMapTextures("03");
-        assetManager.loadMapTextures("04");
-        assetManager.loadMapTextures("05");
-        assetManager.loadMapTextures("06");
-        assetManager.loadMapTextures("07");
-        assetManager.loadMapTextures("08");
+        //Map tiles and map plan
+        String[] tiles_name = {"00","01","02","03","04","05","06","07","08"};
+        String[] tiles_path = {"tiles/00.png","tiles/01.png","tiles/02.png","tiles/03.png","tiles/04.png",
+            "tiles/05.png","tiles/06.png","tiles/07.png","tiles/08.png"};
+        assetManager.loadMultipleTextures(tiles_name, tiles_path);
         mapLoader.loadMap("maps/test_ground.txt");
-        assetManager.loadTexture("player_idle.png");
+
+        //Sprites
+        assetManager.loadTexture("player_idle", "sprites/player_idle.png");
 
         //calc center of the map
         int mapWidth = mapLoader.getMapData()[0].length * 32;
@@ -65,7 +62,7 @@ public class Main extends ApplicationAdapter {
         player.addComponent(ControlComponent.class, control);
 
         SpriteComponent sprite = new SpriteComponent();
-        sprite.texture = assetManager.getTexture("player_idle.png");
+        sprite.texture = assetManager.getTexture("player_idle");
         player.addComponent(SpriteComponent.class, sprite);
 
         ColliderComponent collider = new ColliderComponent(transform.x, transform.y, TILE_SIZE / 2, TILE_SIZE / 2);
