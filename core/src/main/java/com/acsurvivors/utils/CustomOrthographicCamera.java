@@ -7,13 +7,17 @@ import com.badlogic.gdx.math.Vector3;
 public class CustomOrthographicCamera {
     private final OrthographicCamera camera;
     private final Vector2 position;
-    private float lerpSpeed = 4.0f;
+    private float lerpSpeed = 0.1f;
     private float worldWidth, worldHeight;
+    private static final float TOLERANCE = 0.1f;
 
     public CustomOrthographicCamera(float viewportWidth, float viewportHeight) {
         camera = new OrthographicCamera(viewportWidth, viewportHeight);
-        position = new Vector2(camera.position.x, camera.position.y);
+        this.camera.viewportWidth = 512;  // Dimensiunea camerei pe axa X
+        this.camera.viewportHeight = 512; // Dimensiunea camerei pe axa Y
         camera.update();
+        position = new Vector2(camera.position.x, camera.position.y);
+
     }
 
     public void setWorldBounds(float width, float height) {
@@ -37,10 +41,29 @@ public class CustomOrthographicCamera {
 
         float buffer = 16f;
 
-        if (worldWidth > 0 && worldHeight > 0) {
-            position.x = Math.max(halfViewportWidth + buffer, Math.min(worldWidth - halfViewportWidth - buffer, position.x));
-            position.y = Math.max(halfViewportHeight + buffer, Math.min(worldHeight - halfViewportHeight - buffer, position.y));
+        // Limitele hartii
+        float minX = halfViewportWidth + buffer;
+        float maxX = worldWidth - halfViewportWidth - buffer;
+        float minY = halfViewportHeight + buffer;
+        float maxY = worldHeight - halfViewportHeight - buffer;
+
+
+        if (Math.abs(position.x - minX) < TOLERANCE) {
+            position.x = minX;
+        } else if (Math.abs(position.x - maxX) < TOLERANCE) {
+            position.x = maxX;
+        } else {
+            position.x = Math.max(minX, Math.min(maxX, position.x));
         }
+
+        if (Math.abs(position.y - minY) < TOLERANCE) {
+            position.y = minY;
+        } else if (Math.abs(position.y - maxY) < TOLERANCE) {
+            position.y = maxY;
+        } else {
+            position.y = Math.max(minY, Math.min(maxY, position.y));
+        }
+
 
         camera.position.set(position.x, position.y, 0);
         camera.update();
@@ -63,5 +86,6 @@ public class CustomOrthographicCamera {
         Vector3 worldCoords = camera.unproject(new Vector3(screenCoords.x, screenCoords.y, 0));
         return new Vector2(worldCoords.x, worldCoords.y);
     }
+
 }
 

@@ -6,6 +6,7 @@ import com.acsurvivors.utils.AssetManager;
 public class MapLoader {
     private final AssetManager assetManager;
     private String[][] mapData;
+    public static final int TILE_SIZE = 64;
 
     public MapLoader(AssetManager assetManager) {
         this.assetManager = assetManager;
@@ -22,5 +23,18 @@ public class MapLoader {
 
     public String[][] getMapData() {
         return mapData;
+    }
+
+    // Verifica daca un tile este solid (blocant)
+    public boolean isTileSolid(int x, int y) {
+        String[][] mapData = getMapData();
+
+        if (x < 0 || y < 0 || y >= mapData.length || x >= mapData[0].length) {
+            return true;  // Tile-urile din afara hărții sunt solide
+        }
+
+        String tile = mapData[y][x];
+
+        return !tile.equals("00");
     }
 }
