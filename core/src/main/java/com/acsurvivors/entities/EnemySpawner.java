@@ -61,7 +61,7 @@ public class EnemySpawner {
         SpriteComponent sprite = new SpriteComponent(new TextureRegion(assetManager.getTexture("player_idle_1")));
         enemy.addComponent(SpriteComponent.class, sprite);
 
-        ColliderComponent collider = new ColliderComponent(transform.x, transform.y, TILE_SIZE, TILE_SIZE, mapLoader);
+        ColliderComponent collider = new ColliderComponent(transform.x, transform.y, TILE_SIZE, TILE_SIZE);
         enemy.addComponent(ColliderComponent.class, collider);
         collider.updatePosition(transform.x, transform.y);
     }

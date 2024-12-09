@@ -6,30 +6,32 @@ import com.acsurvivors.entities.components.AnimatedSpriteComponent;
 import com.acsurvivors.entities.components.ControlComponent;
 import com.acsurvivors.entities.components.ColliderComponent;
 import com.acsurvivors.entities.components.TransformComponent;
-import com.acsurvivors.utils.MapLoader; // Import MapLoader pentru verificarea tile-urilor
+import com.acsurvivors.utils.ColliderManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.math.Rectangle;
 
 public class ControlSystem {
-    private MapLoader mapLoader;
+    private final ColliderManager colliderManager;
 
-    public ControlSystem(MapLoader mapLoader) {
-        this.mapLoader = mapLoader;
+    public ControlSystem(ColliderManager colliderManager) {
+        this.colliderManager = colliderManager;
     }
 
     public void update(EntityManager entityManager, float delta) {
         for (Entity entity : entityManager.getEntities()) {
             if (entity.hasComponent(ControlComponent.class) &&
-                entity.hasComponent(TransformComponent.class)) {
+                entity.hasComponent(TransformComponent.class) &&
+                entity.hasComponent(ColliderComponent.class)) {
 
                 ControlComponent control = entity.getComponent(ControlComponent.class);
                 TransformComponent transform = entity.getComponent(TransformComponent.class);
+                ColliderComponent collider = entity.getComponent(ColliderComponent.class);
 
                 control.velocity.set(0, 0);
 
                 boolean isMoving = false;
 
+                // Detect input for movement
                 if (Gdx.input.isKeyPressed(Input.Keys.W)) {
                     control.velocity.y += control.speed;
                     isMoving = true;
@@ -47,8 +49,18 @@ public class ControlSystem {
                     isMoving = true;
                 }
 
+                // Normalize velocity if exceeding max speed
                 if (control.velocity.len() > control.speed) {
                     control.velocity.nor().scl(control.speed);
+                }
+
+                float newX = transform.x + control.velocity.x * delta;
+                float newY = transform.y + control.velocity.y * delta;
+
+                if (!colliderManager.isCollidingWithMap(collider, newX, newY)) {
+                    collider.updatePosition(newX, newY);
+                    transform.x = newX;
+                    transform.y = newY;
                 }
 
                 if (entity.hasComponent(AnimatedSpriteComponent.class)) {
@@ -62,65 +74,7 @@ public class ControlSystem {
                     if (control.velocity.x > 0) animatedSprite.flipX = false;
                     else if (control.velocity.x < 0) animatedSprite.flipX = true;
                 }
-
-                if (entity.hasComponent(ColliderComponent.class)) {
-                    ColliderComponent collider = entity.getComponent(ColliderComponent.class);
-                    collider.updatePosition(transform.x, transform.y);
-
-                    float proposedX = transform.x + control.velocity.x * delta;
-                    float proposedY = transform.y + control.velocity.y * delta;
-
-                    if (!isCollidingWithMap(proposedX, transform.y, collider)) {
-                        transform.x = proposedX;
-                    }
-                    if (!isCollidingWithMap(transform.x, proposedY, collider)) {
-                        transform.y = proposedY;
-                    }
-                }
-
             }
         }
-        /*
-        if (transform == null) return;
-
-        // Actualizam inamicii pentru a urmari player-ul
-        for (Entity entity : entityManager.getEntities()) {
-            if (entity.hasComponent(TransformComponent.class) &&
-                    !entity.hasComponent(ControlComponent.class)) {
-                TransformComponent enemyTransform = entity.getComponent(TransformComponent.class);
-
-                float deltaX = transform.x - enemyTransform.x;
-                float deltaY = transform.y - enemyTransform.y;
-
-                float distance = (float) Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-                float speed = 100 * delta;
-
-                // Muta inamicul catre player
-                if (distance > 0) {
-                    float proposedX = enemyTransform.x + (deltaX / distance) * speed;
-                    float proposedY = enemyTransform.y + (deltaY / distance) * speed;
-
-                    if (!isCollidingWithMap(proposedX, enemyTransform.y, null)) {
-                        enemyTransform.x = proposedX;
-                    }
-                    if (!isCollidingWithMap(enemyTransform.x, proposedY, null)) {
-                        enemyTransform.y = proposedY;
-                    }
-                }
-            }
-        }*/
     }
-
-    private boolean isCollidingWithMap(float x, float y, ColliderComponent collider) {
-        // Calculează poziția în tile-uri
-        int tileX = (int) (x / 64);
-        int tileY = (int) (y / 64);
-
-        // Verifică coliziunea cu fiecare colț al dreptunghiului de coliziune
-        return mapLoader.isTileSolid(tileX, tileY) ||                         // Stânga-sus
-                mapLoader.isTileSolid(tileX + 1, tileY) ||                     // Dreapta-sus
-                mapLoader.isTileSolid(tileX, tileY + 1) ||                     // Stânga-jos
-                mapLoader.isTileSolid(tileX + 1, tileY + 1);                   // Dreapta-jos
-    }
-
 }

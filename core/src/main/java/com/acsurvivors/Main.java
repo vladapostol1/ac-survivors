@@ -9,7 +9,7 @@ import com.acsurvivors.entities.components.ColliderComponent;
 import com.acsurvivors.entities.components.SpriteComponent;
 import com.acsurvivors.entities.components.TransformComponent;
 import com.acsurvivors.entities.components.ControlComponent;
-import com.acsurvivors.entities.systems.CollisionSystem;
+import com.acsurvivors.utils.ColliderManager;
 import com.acsurvivors.entities.systems.DebugRenderSystem;
 import com.acsurvivors.entities.systems.ControlSystem;
 import com.acsurvivors.utils.AssetManager;
@@ -32,12 +32,11 @@ public class Main extends ApplicationAdapter {
     private EntityManager entityManager;
     private RenderingSystem renderingSystem;
     private MapLoader mapLoader;
+    private ColliderManager colliderManager;
     private AssetManager assetManager;
     private ControlSystem controlSystem;
     private CustomOrthographicCamera camera;
-    private DebugRenderSystem debugRenderSystem;
     private EnemySpawner enemySpawner;
-    private CollisionSystem collisionSystem;
     private float spawnTimer = 0;  // Timer pentru spawnare inamici
     private static final float SPAWN_INTERVAL = 3f;
 
@@ -48,6 +47,8 @@ public class Main extends ApplicationAdapter {
         entityManager = new EntityManager();
         assetManager = new AssetManager();
         mapLoader = new MapLoader(assetManager);
+        colliderManager = new ColliderManager(mapLoader);
+        controlSystem = new ControlSystem(colliderManager);
         camera = new CustomOrthographicCamera(640, 480);
 
         //Assets import
@@ -88,6 +89,7 @@ public class Main extends ApplicationAdapter {
         AnimatedSpriteComponent animatedSprite = new AnimatedSpriteComponent();
 
         AnimatedSpriteComponent.Animation idleAnimation = new AnimatedSpriteComponent.Animation(1f);
+        assetManager.loadTexture("player_idle_1", "sprites/player/player_idle_1.png");
         idleAnimation.addFrame(new TextureRegion(assetManager.getTexture("player_idle_1")));
         idleAnimation.addFrame(new TextureRegion(assetManager.getTexture("player_idle_2")));
         idleAnimation.addFrame(new TextureRegion(assetManager.getTexture("player_idle_3")));
@@ -106,7 +108,8 @@ public class Main extends ApplicationAdapter {
         animatedSprite.setAnimation("idle");
 
         player.addComponent(AnimatedSpriteComponent.class, animatedSprite);
-        ColliderComponent collider = new ColliderComponent(transform.x, transform.y, TILE_SIZE, TILE_SIZE, mapLoader);
+        ColliderComponent collider = new ColliderComponent(transform.x, transform.y, TILE_SIZE/2, TILE_SIZE/2);
+        collider.changeOffset(16, 16);
         player.addComponent(ColliderComponent.class, collider);
 
 
@@ -116,10 +119,6 @@ public class Main extends ApplicationAdapter {
         camera.setPosition(centerX, centerY);
 
         renderingSystem = new RenderingSystem(batch, assetManager);
-
-        controlSystem = new ControlSystem(mapLoader);
-
-        debugRenderSystem = new DebugRenderSystem(mapLoader, camera);
 
         camera.setWorldBounds(mapWidth, mapHeight);
         enemySpawner = new EnemySpawner(entityManager, assetManager, camera, mapLoader);
