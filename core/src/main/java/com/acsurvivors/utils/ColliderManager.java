@@ -17,8 +17,10 @@ public class ColliderManager {
 
     public boolean isCollidingWithMap(ColliderComponent collider, float x, float y) {
         // Calculează poziția în tile-uri
-        int tileX = (int) (x / TILE_SIZE);
-        int tileY = (int) (y / TILE_SIZE);
+
+        // Trb sa cautam o solutie mai dinamica sau schimbat tile-urile de tot
+        int tileX = (int) (x / (TILE_SIZE / 1.5f));
+        int tileY = (int) (y / (TILE_SIZE / 1.5f));
 
         // Verifică coliziunea cu fiecare colț al dreptunghiului de coliziune
         return mapLoader.isTileSolid(tileX, tileY) ||                         // Stânga-sus
@@ -27,7 +29,6 @@ public class ColliderManager {
             mapLoader.isTileSolid(tileX + 1, tileY + 1);                   // Dreapta-jos
     }
 
-    // Check if an entity is colliding with any other entity
     public Entity getCollidingEntity(Entity source, List<Entity> entities) {
         ColliderComponent sourceCollider = source.getComponent(ColliderComponent.class);
         if (sourceCollider == null) return null;
@@ -43,8 +44,6 @@ public class ColliderManager {
         }
         return null; // No collision
     }
-
-    // Check if an entity is colliding with any entities from a specific list
     public boolean isCollidingWithAny(Entity source, List<Entity> entities) {
         return getCollidingEntity(source, entities) != null;
     }

@@ -31,7 +31,6 @@ public class ControlSystem {
 
                 boolean isMoving = false;
 
-                // Detect input for movement
                 if (Gdx.input.isKeyPressed(Input.Keys.W)) {
                     control.velocity.y += control.speed;
                     isMoving = true;
@@ -49,7 +48,6 @@ public class ControlSystem {
                     isMoving = true;
                 }
 
-                // Normalize velocity if exceeding max speed
                 if (control.velocity.len() > control.speed) {
                     control.velocity.nor().scl(control.speed);
                 }

@@ -6,6 +6,7 @@ public class ColliderComponent {
     public Rectangle bounds;
     public int offsetX, offsetY;
 
+
     public ColliderComponent(float x, float y, float width, float height) {
         this.bounds = new Rectangle(x, y, width, height);
     }
