@@ -15,19 +15,19 @@ public class ColliderManager {
         this.mapLoader = mapLoader;
     }
 
-    public boolean isCollidingWithMap(ColliderComponent collider, float x, float y) {
-        // Calculează poziția în tile-uri
+    public boolean isCollidingWithMap(ColliderComponent collider, float futureX, float futureY) {
+        float newX = futureX + collider.offsetX;
+        float newY = futureY + collider.offsetY;
 
-        // Trb sa cautam o solutie mai dinamica sau schimbat tile-urile de tot
-        int tileX = (int) (x / (TILE_SIZE / 1.5f));
-        int tileY = (int) (y / (TILE_SIZE / 1.5f));
+        float width = collider.bounds.width;
+        float height = collider.bounds.height;
 
-        // Verifică coliziunea cu fiecare colț al dreptunghiului de coliziune
-        return mapLoader.isTileSolid(tileX, tileY) ||                         // Stânga-sus
-            mapLoader.isTileSolid(tileX + 1, tileY) ||                     // Dreapta-sus
-            mapLoader.isTileSolid(tileX, tileY + 1) ||                     // Stânga-jos
-            mapLoader.isTileSolid(tileX + 1, tileY + 1);                   // Dreapta-jos
+        return mapLoader.isTileSolid((int) (newX / TILE_SIZE), (int) (newY / TILE_SIZE)) ||
+            mapLoader.isTileSolid((int) ((newX + width) / TILE_SIZE), (int) (newY / TILE_SIZE)) ||
+            mapLoader.isTileSolid((int) (newX / TILE_SIZE), (int) ((newY + height) / TILE_SIZE)) ||
+            mapLoader.isTileSolid((int) ((newX + width) / TILE_SIZE), (int) ((newY + height) / TILE_SIZE));
     }
+
 
     public Entity getCollidingEntity(Entity source, List<Entity> entities) {
         ColliderComponent sourceCollider = source.getComponent(ColliderComponent.class);

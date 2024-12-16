@@ -9,6 +9,7 @@ import java.util.Map;
 public class SceneManager {
     private final Game game;
     private final Map<String,Screen> scenes;
+    private String currentScene = "";
 
     public SceneManager(Game game) {
         this.game = game;
@@ -25,7 +26,14 @@ public class SceneManager {
             throw new IllegalArgumentException("Nu am gasit ecranul: " + name);
         }
 
+        if (!currentScene.isEmpty())
+        {
+            scenes.get(currentScene).hide();
+        }
+
+        currentScene = name;
         game.setScreen(scene);
+        scene.show();
     }
 
     public void dispose() {

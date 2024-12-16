@@ -18,6 +18,8 @@ import java.util.HashSet;
 import static com.acsurvivors.utils.Constants.TILE_SIZE;
 
 public class GameScene extends BaseScene {
+    private boolean hidden = true;
+
     private SpriteBatch batch;
     private EntityManager entityManager;
     private RenderingSystem renderingSystem;
@@ -112,9 +114,19 @@ public class GameScene extends BaseScene {
 
     @Override
     public void show() {
+        hidden = false;
+    }
+
+    @Override
+    public void pause() {
+        hidden = true;
     }
 
     public void render(float delta) {
+        if (hidden) {
+            return;
+        }
+
         ScreenUtils.clear(0f, 0f, 0f, 1f);
 
         delta = Gdx.graphics.getDeltaTime();
@@ -128,8 +140,6 @@ public class GameScene extends BaseScene {
         camera.getCamera().update();
 
         renderingSystem.setProjectionMatrix(camera.getCamera().combined);
-
-        // Render the map and entities
         renderingSystem.renderMap(mapLoader.getMapData(), TILE_SIZE);
         renderingSystem.render(entityManager);
 
