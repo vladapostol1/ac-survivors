@@ -21,7 +21,7 @@ public class LevelComponent {
 
     public void levelUp() {
         experience = experience - experienceNeeded;
-        experienceNeeded = (int)(experienceNeeded * 1.1f);
+        experienceNeeded = (int)(experienceNeeded * 1.05f);
         statPoints++;
         level++;
     }
