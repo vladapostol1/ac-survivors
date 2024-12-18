@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,11 +15,13 @@ public class AssetManager {
     private final Map<String, Texture> textures;
     private final Map<String, Sound> sounds;
     private final Map<String, Music> musicTracks;
+    private final Map<String, BitmapFont> fonts;
 
     public AssetManager() {
         textures = new HashMap<>();
         sounds = new HashMap<>();
         musicTracks = new HashMap<>();
+        fonts = new HashMap<>();
     }
 
     public void loadTexture(String name, String path) {
@@ -62,6 +66,24 @@ public class AssetManager {
         return musicTracks.get(name);
     }
 
+    public void loadFont(String name, String ttfPath, int fontSize) {
+        if (!fonts.containsKey(name)) {
+            FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal(ttfPath));
+            FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+            parameter.size = fontSize;
+            BitmapFont font = generator.generateFont(parameter);
+            fonts.put(name, font);
+            generator.dispose();
+        }
+    }
+
+    public BitmapFont getFont(String name) {
+        if (!fonts.containsKey(name)) {
+            throw new IllegalStateException("Font not loaded: " + name);
+        }
+        return fonts.get(name);
+    }
+
     public void dispose() {
         for (Texture texture : textures.values()) {
             texture.dispose();
@@ -77,6 +99,11 @@ public class AssetManager {
             music.dispose();
         }
         musicTracks.clear();
+
+        for (BitmapFont font : fonts.values()) {
+            font.dispose();
+        }
+        fonts.clear();
     }
 
     public void loadMultipleTextures(String[] names, String[] paths) {
