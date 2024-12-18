@@ -1,3 +1,8 @@
+bg-1.png
+fonts/PixelifySans-Bold.ttf
+fonts/PixelifySans-Medium.ttf
+fonts/PixelifySans-Regular.ttf
+fonts/PixelifySans-SemiBold.ttf
 libgdx.png
 maps/test_ground.txt
 sprites/player/player_idle_1.png

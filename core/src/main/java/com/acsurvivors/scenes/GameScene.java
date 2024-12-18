@@ -26,16 +26,18 @@ public class GameScene extends BaseScene {
     private MapLoader mapLoader;
     private ColliderManager colliderManager;
     private AssetManager assetManager;
+    private SceneManager sceneManager;
     private ControlSystem controlSystem;
     private CustomOrthographicCamera camera;
     private EnemySpawner enemySpawner;
     private float spawnTimer = 0;  // Timer pentru spawnare inamici
     private static final float SPAWN_INTERVAL = 3f;
 
-    public GameScene(){
+    public GameScene(SceneManager sceneManager, AssetManager assetManager){
         batch = new SpriteBatch();
         entityManager = new EntityManager();
-        assetManager = new AssetManager();
+        this.sceneManager = sceneManager;
+        this.assetManager = assetManager;
         mapLoader = new MapLoader(assetManager);
         colliderManager = new ColliderManager(mapLoader);
         controlSystem = new ControlSystem(colliderManager);
@@ -178,7 +180,5 @@ public class GameScene extends BaseScene {
                 }
             }
         }
-
-        assetManager.dispose();
     }
 }
