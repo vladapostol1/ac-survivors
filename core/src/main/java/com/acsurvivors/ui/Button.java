@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 
-public class Button {
+public class Button implements IUIElement {
     private Rectangle bounds;
     private ShapeRenderer shapeRenderer;
     private Label label;
@@ -61,7 +61,7 @@ public class Button {
     }
 
     public void dispose() {
-        label.delete();
+        label.dispose();
         shapeRenderer.dispose();
     }
 }

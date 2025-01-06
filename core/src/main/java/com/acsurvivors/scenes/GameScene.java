@@ -4,10 +4,12 @@ import com.acsurvivors.entities.EnemySpawner;
 import com.acsurvivors.entities.Entity;
 import com.acsurvivors.entities.EntityManager;
 import com.acsurvivors.entities.components.*;
+import com.acsurvivors.ui.ProgressBar;
 import com.acsurvivors.utils.*;
 import com.acsurvivors.entities.systems.DebugRenderSystem;
 import com.acsurvivors.entities.systems.ControlSystem;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -32,6 +34,9 @@ public class GameScene extends BaseScene {
     private EnemySpawner enemySpawner;
     private float spawnTimer = 0;  // Timer pentru spawnare inamici
     private static final float SPAWN_INTERVAL = 3f;
+
+    //UI Components
+    ProgressBar healthBar;
 
     public GameScene(SceneManager sceneManager, AssetManager assetManager){
         batch = new SpriteBatch();
@@ -112,6 +117,9 @@ public class GameScene extends BaseScene {
 
         camera.setWorldBounds(mapWidth, mapHeight);
         enemySpawner = new EnemySpawner(entityManager, assetManager, camera, mapLoader);
+
+        //
+        createUI();
     }
 
     @Override
@@ -150,6 +158,8 @@ public class GameScene extends BaseScene {
             enemySpawner.spawnEnemyNearPlayer(playerTransform.x, playerTransform.y);
             spawnTimer = 0;
         }
+
+        healthBar.draw(batch);
         //debugRenderSystem.render(entityManager);
     }
 
@@ -180,5 +190,10 @@ public class GameScene extends BaseScene {
                 }
             }
         }
+    }
+
+    private void createUI() {
+        healthBar = new ProgressBar(20, 420, 80, 20, 0, 100, Color.RED, Color.GREEN, 2);
+
     }
 }

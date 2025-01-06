@@ -103,7 +103,7 @@ public class MainMenuScene extends BaseScene {
 
     @Override
     public void dispose() {
-        titleLabel.delete();
+        titleLabel.dispose();
         playButton.dispose();
         settingsButton.dispose();
         quitButton.dispose();

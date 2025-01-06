@@ -23,7 +23,7 @@ public class Label {
         font.draw(batch, text, transform.x, transform.y);
     }
 
-    public void delete() {
+    public void dispose() {
         font.dispose();
     }
 }

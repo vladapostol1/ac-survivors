@@ -1,6 +1,8 @@
 package com.acsurvivors.ui;
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+
 public interface IUIElement {
-    void draw();
-    void delete();
+    void draw(SpriteBatch batch);
+    void dispose();
 }
