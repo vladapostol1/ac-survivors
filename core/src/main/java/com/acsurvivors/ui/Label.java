@@ -10,6 +10,7 @@ public class Label implements  IUIElement {
     public Color color;
     public BitmapFont font;
     public TransformComponent transform;
+    private boolean active = true;
 
     public Label(String text, Color color, BitmapFont font, TransformComponent transform) {
         this.text = text;
@@ -30,5 +31,10 @@ public class Label implements  IUIElement {
     @Override
     public boolean isActive() {
         return active;
+    }
+
+    @Override
+    public void setActive(boolean active){
+        this.active = active;
     }
 }

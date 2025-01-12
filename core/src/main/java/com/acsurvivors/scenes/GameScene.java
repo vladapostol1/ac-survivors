@@ -41,6 +41,10 @@ public class GameScene extends BaseScene {
     private static final float SPAWN_INTERVAL = 3f;
 
     //UI Components
+    private Label timeLabel;
+    private Label moneyLabel;
+    private ProgressBar healthBar;
+    private Label playerPos;
     private IUIElement[] uiElements;
 
     private int money = 0;
@@ -75,8 +79,8 @@ public class GameScene extends BaseScene {
         assetManager.loadTexture("player_walk_3", "sprites/player/player_walk_3.png");
 
         //calc center of the map
-        int mapWidth = mapLoader.getMapData()[0].length * 32;
-        int mapHeight = mapLoader.getMapData().length * 32;
+        int mapWidth = TILE_SIZE * 32;
+        int mapHeight = TILE_SIZE * 32;
         int centerX = mapWidth / 2;
         int centerY = mapHeight / 2;
         System.out.println("centerX " + centerX);
@@ -158,11 +162,21 @@ public class GameScene extends BaseScene {
         camera.setPosition(playerTransform.x + TILE_SIZE / 2, playerTransform.y + TILE_SIZE / 2);
         camera.getCamera().update();
 
-        /*timer -= delta;
-        if (timer < 0) timer = 0;
-        uiElements[2].text = String.format("%.0f", timer);
+        if (Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.X)) {
+            playerPos.setActive(!playerPos.isActive());
+        }
 
-        moneyLabel.text = "Gold: " + money;*/
+        if (playerPos.isActive()) {
+            playerPos.text = String.format("X: %.0f, Y: %.0f", playerTransform.x, playerTransform.y);
+            playerPos.transform.x = screenWidth - 200;
+            playerPos.transform.y = screenHeight - 20;
+        }
+
+        timer -= delta;
+        if (timer < 0) timer = 0;
+        timeLabel.text = String.format("%.0f", timer);
+
+        moneyLabel.text = "Gold: " + money;
 
         renderingSystem.setProjectionMatrix(camera.getCamera().combined);
         renderingSystem.renderMap(mapLoader.getMapData(), TILE_SIZE);
@@ -176,9 +190,9 @@ public class GameScene extends BaseScene {
     }
 
     private void createUI() {
-        ProgressBar healthBar = new ProgressBar(20, 420, 100, 20, 0, 100, Color.WHITE, Color.GREEN, 1);
+        healthBar = new ProgressBar(20, 420, 100, 20, 0, 100, Color.WHITE, Color.GREEN, 1);
 
-        Label moneyLabel = new Label(
+        moneyLabel = new Label(
             "Gold: 0",
             Color.WHITE,
             assetManager.getFont("buttonFont"),
@@ -187,7 +201,7 @@ public class GameScene extends BaseScene {
         moneyLabel.transform.x = 20;
         moneyLabel.transform.y = screenHeight - 80;
 
-        Label timeLabel = new Label(
+        timeLabel = new Label(
             "60",
             Color.WHITE,
             assetManager.getFont("titleFont"),
@@ -197,6 +211,14 @@ public class GameScene extends BaseScene {
         timeLabel.transform.x = (screenWidth - timeLabelWidth) / 2;
         timeLabel.transform.y = screenHeight - 20;
 
-        uiElements = new IUIElement[] { healthBar, moneyLabel, timeLabel };
+        playerPos = new Label(
+            "X: , Y:",
+            Color.WHITE,
+            assetManager.getFont("buttonFont"),
+            new TransformComponent()
+        );
+        playerPos.setActive(false);
+
+        uiElements = new IUIElement[] { healthBar, moneyLabel, timeLabel, playerPos };
     }
 }

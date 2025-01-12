@@ -16,6 +16,7 @@ public class Button implements IUIElement {
     private Color hoverColor;
     private boolean isHovered;
     private Runnable onClick;
+    private boolean active = true;
 
     public Button(String text, float x, float y, float width, float height, BitmapFont font, Color textColor, Color backgroundColor, Color hoverColor) {
         this.bounds = new Rectangle(x, y, width, height);
@@ -68,5 +69,10 @@ public class Button implements IUIElement {
     @Override
     public boolean isActive() {
         return active;
+    }
+
+    @Override
+    public void setActive(boolean active){
+        this.active = active;
     }
 }

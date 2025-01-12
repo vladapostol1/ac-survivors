@@ -37,16 +37,13 @@ public class CustomOrthographicCamera {
         float halfViewportWidth = camera.viewportWidth / 2f;
         float halfViewportHeight = camera.viewportHeight / 2f;
 
-        float buffer = TILE_SIZE/2;
-
-        if (worldWidth > 0 && worldHeight > 0) {
-            position.x = Math.max(halfViewportWidth + buffer, Math.min(worldWidth - halfViewportWidth - buffer, position.x));
-            position.y = Math.max(halfViewportHeight + buffer, Math.min(worldHeight - halfViewportHeight - buffer, position.y));
-        }
+        position.x = Math.max(halfViewportWidth, Math.min(worldWidth - halfViewportWidth, position.x));
+        position.y = Math.max(halfViewportHeight, Math.min(worldHeight - halfViewportHeight, position.y));
 
         camera.position.set(position.x, position.y, 0);
         camera.update();
     }
+
 
     public OrthographicCamera getCamera() {
         return camera;
