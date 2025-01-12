@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-public class Label implements  IUIElement {
+public class Label implements  IUIElement, Transformable {
     public String text;
     public Color color;
     public BitmapFont font;
@@ -36,5 +36,11 @@ public class Label implements  IUIElement {
     @Override
     public void setActive(boolean active){
         this.active = active;
+    }
+
+    @Override
+    public void setPosition(float x, float y) {
+        this.transform.x = x;
+        this.transform.y = y;
     }
 }

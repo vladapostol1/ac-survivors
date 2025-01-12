@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 
-public class Button implements IUIElement {
+public class Button implements IUIElement, Transformable {
     private Rectangle bounds;
     private ShapeRenderer shapeRenderer;
     private Label label;
@@ -23,7 +23,7 @@ public class Button implements IUIElement {
         this.backgroundColor = backgroundColor;
         this.hoverColor = hoverColor;
         this.shapeRenderer = new ShapeRenderer();
-
+        
         GlyphLayout layout = new GlyphLayout(font, text);
         float labelWidth = layout.width;
         float labelHeight = layout.height;
@@ -35,8 +35,9 @@ public class Button implements IUIElement {
         this.label = new Label(text, textColor, font, labelTransform);
     }
 
-
     public void draw(SpriteBatch batch) {
+        if (!active) return;
+
         Color currentColor = isHovered ? hoverColor : backgroundColor;
 
         batch.end();
@@ -61,6 +62,20 @@ public class Button implements IUIElement {
         }
     }
 
+    @Override
+    public void setPosition(float x, float y) {
+        bounds.setPosition(x, y);
+
+        GlyphLayout layout = new GlyphLayout(label.font, label.text);
+        float labelWidth = layout.width;
+        float labelHeight = layout.height;
+
+        label.setPosition(
+            x + (bounds.width - labelWidth) / 2,
+            y + (bounds.height + labelHeight) / 2
+        );
+    }
+
     public void dispose() {
         label.dispose();
         shapeRenderer.dispose();
@@ -72,7 +87,7 @@ public class Button implements IUIElement {
     }
 
     @Override
-    public void setActive(boolean active){
+    public void setActive(boolean active) {
         this.active = active;
     }
 }
