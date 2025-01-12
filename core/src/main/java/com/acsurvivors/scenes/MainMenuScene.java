@@ -31,7 +31,6 @@ public class MainMenuScene extends BaseScene {
     @Override
     public void show() {
         batch = new SpriteBatch();
-        BitmapFont font = new BitmapFont();
 
         String titleText = "AC Survivors";
         GlyphLayout layout = new GlyphLayout(assetManager.getFont("titleFont"), titleText);

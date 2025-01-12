@@ -4,6 +4,8 @@ import com.acsurvivors.entities.EnemySpawner;
 import com.acsurvivors.entities.Entity;
 import com.acsurvivors.entities.EntityManager;
 import com.acsurvivors.entities.components.*;
+import com.acsurvivors.ui.IUIElement;
+import com.acsurvivors.ui.Label;
 import com.acsurvivors.ui.ProgressBar;
 import com.acsurvivors.utils.*;
 import com.acsurvivors.entities.systems.DebugRenderSystem;
@@ -11,18 +13,21 @@ import com.acsurvivors.entities.systems.ControlSystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 import java.util.HashSet;
 
-import static com.acsurvivors.utils.Constants.TILE_SIZE;
+import static com.acsurvivors.utils.Constants.*;
 
 public class GameScene extends BaseScene {
     private boolean hidden = true;
 
     private SpriteBatch batch;
+    private SpriteBatch uiBatch;
     private EntityManager entityManager;
     private RenderingSystem renderingSystem;
     private MapLoader mapLoader;
@@ -36,10 +41,14 @@ public class GameScene extends BaseScene {
     private static final float SPAWN_INTERVAL = 3f;
 
     //UI Components
-    ProgressBar healthBar;
+    private IUIElement[] uiElements;
+
+    private int money = 0;
+    private float timer = 60f;
 
     public GameScene(SceneManager sceneManager, AssetManager assetManager){
         batch = new SpriteBatch();
+        uiBatch = new SpriteBatch();
         entityManager = new EntityManager();
         this.sceneManager = sceneManager;
         this.assetManager = assetManager;
@@ -119,6 +128,7 @@ public class GameScene extends BaseScene {
         enemySpawner = new EnemySpawner(entityManager, assetManager, camera, mapLoader);
 
         //
+        uiBatch.setProjectionMatrix(new Matrix4().idt());
         createUI();
     }
 
@@ -132,68 +142,61 @@ public class GameScene extends BaseScene {
         hidden = true;
     }
 
+    @Override
     public void render(float delta) {
         if (hidden) {
             return;
         }
 
         ScreenUtils.clear(0f, 0f, 0f, 1f);
-
         delta = Gdx.graphics.getDeltaTime();
 
-        //updates
         controlSystem.update(entityManager, delta);
+
         Entity player = entityManager.getEntities().get(0);
         TransformComponent playerTransform = player.getComponent(TransformComponent.class);
         camera.setPosition(playerTransform.x + TILE_SIZE / 2, playerTransform.y + TILE_SIZE / 2);
-
         camera.getCamera().update();
+
+        /*timer -= delta;
+        if (timer < 0) timer = 0;
+        uiElements[2].text = String.format("%.0f", timer);
+
+        moneyLabel.text = "Gold: " + money;*/
 
         renderingSystem.setProjectionMatrix(camera.getCamera().combined);
         renderingSystem.renderMap(mapLoader.getMapData(), TILE_SIZE);
         renderingSystem.render(entityManager);
-
-        spawnTimer += delta;
-        if (spawnTimer >= SPAWN_INTERVAL) {
-            enemySpawner.spawnEnemyNearPlayer(playerTransform.x, playerTransform.y);
-            spawnTimer = 0;
-        }
-
-        healthBar.draw(batch);
-        //debugRenderSystem.render(entityManager);
+        renderingSystem.renderUI(uiElements);
     }
 
     @Override
     public void dispose() {
         batch.dispose();
-        HashSet<Texture> disposedTextures = new HashSet<>();
-
-        for (Entity entity : entityManager.getEntities()) {
-            if (entity.hasComponent(SpriteComponent.class)) {
-                Texture texture = entity.getComponent(SpriteComponent.class).textureRegion.getTexture();
-                if (texture != null && !disposedTextures.contains(texture)) {
-                    texture.dispose();
-                    disposedTextures.add(texture);
-                }
-            }
-
-            if (entity.hasComponent(AnimatedSpriteComponent.class)) {
-                AnimatedSpriteComponent animComponent = entity.getComponent(AnimatedSpriteComponent.class);
-                for (AnimatedSpriteComponent.Animation animation : animComponent.getAnimations().values()) {
-                    for (TextureRegion frame : animation.frames) {
-                        Texture texture = frame.getTexture();
-                        if (texture != null && !disposedTextures.contains(texture)) {
-                            texture.dispose();
-                            disposedTextures.add(texture);
-                        }
-                    }
-                }
-            }
-        }
     }
 
     private void createUI() {
-        healthBar = new ProgressBar(20, 420, 80, 20, 0, 100, Color.RED, Color.GREEN, 2);
+        ProgressBar healthBar = new ProgressBar(20, 420, 100, 20, 0, 100, Color.WHITE, Color.GREEN, 1);
 
+        Label moneyLabel = new Label(
+            "Gold: 0",
+            Color.WHITE,
+            assetManager.getFont("buttonFont"),
+            new TransformComponent()
+        );
+        moneyLabel.transform.x = 20;
+        moneyLabel.transform.y = screenHeight - 80;
+
+        Label timeLabel = new Label(
+            "60",
+            Color.WHITE,
+            assetManager.getFont("titleFont"),
+            new TransformComponent()
+        );
+        float timeLabelWidth = new GlyphLayout(assetManager.getFont("titleFont"), "60").width;
+        timeLabel.transform.x = (screenWidth - timeLabelWidth) / 2;
+        timeLabel.transform.y = screenHeight - 20;
+
+        uiElements = new IUIElement[] { healthBar, moneyLabel, timeLabel };
     }
 }

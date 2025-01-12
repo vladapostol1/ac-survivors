@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-public class Label {
+public class Label implements  IUIElement {
     public String text;
     public Color color;
     public BitmapFont font;
@@ -25,5 +25,10 @@ public class Label {
 
     public void dispose() {
         font.dispose();
+    }
+
+    @Override
+    public boolean isActive() {
+        return active;
     }
 }

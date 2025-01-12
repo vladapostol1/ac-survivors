@@ -27,7 +27,7 @@ public class Main extends Game {
         sceneManager.addScene("Game", gameScene);
 
         //Doar pentru development
-        if (DEBUG_MODE)
+        if (DEBUG_MODE == false)
             sceneManager.setScene("MainMenu");
         else
             sceneManager.setScene("Game");

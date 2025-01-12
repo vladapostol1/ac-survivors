@@ -6,6 +6,7 @@ import com.acsurvivors.entities.components.AnimatedSpriteComponent;
 import com.acsurvivors.entities.components.ColliderComponent;
 import com.acsurvivors.entities.components.SpriteComponent;
 import com.acsurvivors.entities.components.TransformComponent;
+import com.acsurvivors.ui.IUIElement;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -18,11 +19,13 @@ import static com.acsurvivors.utils.Constants.TILE_SIZE;
 
 public class RenderingSystem {
     private final SpriteBatch batch;
+    private final SpriteBatch uiBatch;
     private final AssetManager assetManager;
     private final ShapeRenderer shapeRenderer;
 
     public RenderingSystem(SpriteBatch batch, AssetManager assetManager) {
         this.batch = batch;
+        this.uiBatch = new SpriteBatch();
         this.assetManager = assetManager;
         this.shapeRenderer = new ShapeRenderer();
     }
@@ -89,6 +92,15 @@ public class RenderingSystem {
                 }
             }
             shapeRenderer.end();
+        }
+    }
+
+    public void renderUI(IUIElement[] uiElements){
+        for (IUIElement element : uiElements) {
+            uiBatch.begin();
+            if(element.isActive())
+                element.draw(uiBatch);
+            uiBatch.end();
         }
     }
 

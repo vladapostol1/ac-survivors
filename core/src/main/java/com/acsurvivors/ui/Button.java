@@ -64,4 +64,9 @@ public class Button implements IUIElement {
         label.dispose();
         shapeRenderer.dispose();
     }
+
+    @Override
+    public boolean isActive() {
+        return active;
+    }
 }

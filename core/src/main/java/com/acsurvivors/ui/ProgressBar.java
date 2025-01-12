@@ -34,6 +34,7 @@ public class ProgressBar implements IUIElement {
 
     public void draw(SpriteBatch batch) {
 
+        batch.end();
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(marginColor);
         shapeRenderer.rect(boundsOutline.x, boundsOutline.y, boundsOutline.width, boundsOutline.height);
@@ -43,9 +44,16 @@ public class ProgressBar implements IUIElement {
         shapeRenderer.setColor(mainColor);
         shapeRenderer.rect(bounds.x, bounds.y, bounds.width, bounds.height);
         shapeRenderer.end();
+
+        batch.begin();
     }
 
     public void dispose() {
         shapeRenderer.dispose();
+    }
+
+    @Override
+    public boolean isActive() {
+        return active;
     }
 }
