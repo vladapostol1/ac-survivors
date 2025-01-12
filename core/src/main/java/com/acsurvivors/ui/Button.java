@@ -23,7 +23,7 @@ public class Button implements IUIElement, Transformable {
         this.backgroundColor = backgroundColor;
         this.hoverColor = hoverColor;
         this.shapeRenderer = new ShapeRenderer();
-        
+
         GlyphLayout layout = new GlyphLayout(font, text);
         float labelWidth = layout.width;
         float labelHeight = layout.height;

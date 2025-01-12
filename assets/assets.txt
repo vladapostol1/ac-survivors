@@ -3,6 +3,7 @@ fonts/PixelifySans-Bold.ttf
 fonts/PixelifySans-Medium.ttf
 fonts/PixelifySans-Regular.ttf
 fonts/PixelifySans-SemiBold.ttf
+items/item01.png
 libgdx.png
 maps/test_ground.txt
 sprites/player/player_idle_1.png

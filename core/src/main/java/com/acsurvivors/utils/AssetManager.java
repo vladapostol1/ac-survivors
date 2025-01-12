@@ -16,12 +16,14 @@ public class AssetManager {
     private final Map<String, Sound> sounds;
     private final Map<String, Music> musicTracks;
     private final Map<String, BitmapFont> fonts;
+    private final Map<String, ItemData> items;
 
     public AssetManager() {
         textures = new HashMap<>();
         sounds = new HashMap<>();
         musicTracks = new HashMap<>();
         fonts = new HashMap<>();
+        items = new HashMap<>();
     }
 
     public void loadTexture(String name, String path) {
@@ -104,6 +106,8 @@ public class AssetManager {
             font.dispose();
         }
         fonts.clear();
+
+        items.clear();
     }
 
     public void loadMultipleTextures(String[] names, String[] paths) {
@@ -114,5 +118,23 @@ public class AssetManager {
         for (int i = 0; i < names.length; i++) {
             loadTexture(names[i], paths[i]);
         }
+    }
+
+    public void loadItem(String id, String name,int value, String stat, String iconPath) {
+        if (!items.containsKey(id)) {
+            loadTexture(id, iconPath);
+            items.put(id, new ItemData(name, value, stat, iconPath));
+        }
+    }
+
+    public ItemData getItem(String id) {
+        if (!items.containsKey(id)) {
+            throw new IllegalStateException("Item not loaded: " + id);
+        }
+        return items.get(id);
+    }
+
+    public Map<String, ItemData> getAllItems() {
+        return items;
     }
 }

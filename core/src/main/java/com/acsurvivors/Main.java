@@ -18,6 +18,7 @@ public class Main extends Game {
         assetManager = new AssetManager();
 
         loadAssets();
+        loadItems();
 
         //Scenes loader
         MainMenuScene mainMenuScene = new MainMenuScene(sceneManager, assetManager);
@@ -47,5 +48,9 @@ public class Main extends Game {
         assetManager.loadFont("titleFont", "fonts/PixelifySans-Bold.ttf", 48);
         assetManager.loadFont("buttonFont", "fonts/PixelifySans-Medium.ttf", 24);
         assetManager.loadTexture("backgroundImage", "bg-1.png");
+    }
+
+    private void loadItems(){
+        assetManager.loadItem("1", "Cheese", 1, "maxHealth", "items/item01.png");
     }
 }
