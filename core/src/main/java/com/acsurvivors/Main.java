@@ -47,10 +47,11 @@ public class Main extends Game {
     private void loadAssets() {
         assetManager.loadFont("titleFont", "fonts/PixelifySans-Bold.ttf", 48);
         assetManager.loadFont("buttonFont", "fonts/PixelifySans-Medium.ttf", 24);
+        assetManager.loadFont("textFont", "fonts/PixelifySans-Medium.ttf", 16);
         assetManager.loadTexture("backgroundImage", "bg-1.png");
     }
 
     private void loadItems(){
-        assetManager.loadItem("1", "Cheese", 1, "maxHealth", "items/item01.png");
+        assetManager.loadItem("item01", "Cheese", 1, "maxHealth", "items/item01.png");
     }
 }

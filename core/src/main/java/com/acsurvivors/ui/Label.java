@@ -43,4 +43,10 @@ public class Label implements  IUIElement, Transformable {
         this.transform.x = x;
         this.transform.y = y;
     }
+
+    @Override
+    public float getX(){ return transform.x;}
+
+    @Override
+    public float getY(){ return transform.y;}
 }

@@ -4,21 +4,25 @@ import com.acsurvivors.entities.EnemySpawner;
 import com.acsurvivors.entities.Entity;
 import com.acsurvivors.entities.EntityManager;
 import com.acsurvivors.entities.components.*;
-import com.acsurvivors.ui.IUIElement;
-import com.acsurvivors.ui.Label;
-import com.acsurvivors.ui.ProgressBar;
+import com.acsurvivors.ui.*;
+import com.acsurvivors.ui.extended.EmptySlot;
+import com.acsurvivors.ui.extended.ShopItemBox;
 import com.acsurvivors.utils.*;
 import com.acsurvivors.entities.systems.DebugRenderSystem;
 import com.acsurvivors.entities.systems.ControlSystem;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.acsurvivors.ui.extended.Item;
 
 import java.util.HashSet;
+import java.util.List;
 
 import static com.acsurvivors.utils.Constants.*;
 
@@ -44,10 +48,12 @@ public class GameScene extends BaseScene {
     private Label moneyLabel;
     private ProgressBar healthBar;
     private Label playerPos;
+    private Panel endRoundMenu;
+    private boolean menuActive = false;
     private IUIElement[] uiElements;
 
-    private int money = 0;
     private float timer = 60f;
+    private Player playerInv;
 
     public GameScene(SceneManager sceneManager, AssetManager assetManager){
         batch = new SpriteBatch();
@@ -59,6 +65,7 @@ public class GameScene extends BaseScene {
         colliderManager = new ColliderManager(mapLoader);
         controlSystem = new ControlSystem(colliderManager);
         camera = new CustomOrthographicCamera(640, 480);
+        playerInv = new Player();
 
         //Assets import
         //Map tiles and map plan
@@ -119,7 +126,6 @@ public class GameScene extends BaseScene {
         collider.changeOffset(16, 16);
         player.addComponent(ColliderComponent.class, collider);
 
-
         //Enemy
 
 
@@ -165,6 +171,24 @@ public class GameScene extends BaseScene {
             playerPos.setActive(!playerPos.isActive());
         }
 
+        if (Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.Z)) {
+            endRoundMenu.setActive(!endRoundMenu.isActive());
+        }
+
+        if (menuActive) {
+            float mouseX = Gdx.input.getX();
+            float mouseY = Gdx.graphics.getHeight() - Gdx.input.getY();
+            boolean isMousePressed = Gdx.input.isButtonPressed(Input.Buttons.LEFT);
+
+            //endRoundMenu.update(mouseX, mouseY, isMousePressed);
+
+            batch.begin();
+            endRoundMenu.draw(batch);
+            batch.end();
+
+            return; // Skip the rest of the game logic
+        }
+
         if (playerPos.isActive()) {
             playerPos.text = String.format("X: %.0f, Y: %.0f", playerTransform.x, playerTransform.y);
             playerPos.transform.x = screenWidth - 200;
@@ -175,7 +199,7 @@ public class GameScene extends BaseScene {
         if (timer < 0) timer = 0;
         timeLabel.text = String.format("%.0f", timer);
 
-        moneyLabel.text = "Gold: " + money;
+        moneyLabel.text = "Gold: " + playerInv.getGold();
 
         renderingSystem.setProjectionMatrix(camera.getCamera().combined);
         renderingSystem.renderMap(mapLoader.getMapData(), TILE_SIZE);
@@ -218,6 +242,77 @@ public class GameScene extends BaseScene {
         );
         playerPos.setActive(false);
 
-        uiElements = new IUIElement[] { healthBar, moneyLabel, timeLabel, playerPos };
+        createEndRoundMenu(playerInv);
+        uiElements = new IUIElement[] { healthBar, moneyLabel, timeLabel, playerPos, endRoundMenu};
     }
+
+    private void createEndRoundMenu(Player player) {
+        endRoundMenu = new Panel(0, 0);
+        endRoundMenu.setSize(screenWidth, screenHeight);
+        endRoundMenu.setBackgroundColor(Color.BLACK);
+
+        Panel leftPanel = new Panel(0, 0);
+        String shopTitleText = "SHOP";
+        GlyphLayout layout = new GlyphLayout(assetManager.getFont("buttonFont"), shopTitleText);
+        float shopTitleWidth = layout.width;
+        float shopTitleX = (512 - shopTitleWidth) / 2;
+
+        Label shopTitle = new Label(shopTitleText, Color.WHITE, assetManager.getFont("buttonFont"), new TransformComponent());
+        shopTitle.setPosition(shopTitleX, screenHeight - 20);
+        GridLayout shopGrid = new GridLayout(8, screenHeight - 120, 3, 2, 200, 80, 12);
+
+        ItemData cheeseData = assetManager.getItem("item01");
+        Texture cheeseTexture = assetManager.getTexture("item01");
+
+        for (int i = 1; i <= 6; i++) {
+            ShopItemBox cheeseShopItem = new ShopItemBox(
+                cheeseData,
+                cheeseTexture,
+                0, 0, 250, 80,
+                assetManager.getFont("textFont"),
+                player,
+                10
+            );
+            shopGrid.addChild(cheeseShopItem);
+        }
+
+        GridLayout inventoryGrid = new GridLayout(0, 0, 2, 8, 48, 48, 4);
+        inventoryGrid.setPosition(8, 64);
+
+        for (int i = 0; i < 16; i++) {
+            if (i < player.getInventory().size()) {
+                ItemData itemData = player.getInventory().get(i);
+                inventoryGrid.addChild(new Item(
+                    itemData,
+                    assetManager.getTexture(itemData.getIconPath()),
+                    0, 0, 48, 48,
+                    assetManager.getFont("textFont")
+                ));
+            } else {
+                inventoryGrid.addChild(new EmptySlot(0, 0, 48, 48, Color.DARK_GRAY));
+            }
+        }
+        leftPanel.addChild(shopTitle);
+        leftPanel.addChild(shopGrid);
+        leftPanel.addChild(inventoryGrid);
+
+        Panel rightPanel = new Panel(512, 0);
+
+        Label statsLabel = new Label("Stats\nHP: 100\nAtk: 20", Color.WHITE, assetManager.getFont("textFont"), new TransformComponent());
+        statsLabel.setPosition(10, 400);
+
+        Button nextButton = new Button("Next Round", 10, 20, 108, 40, assetManager.getFont("textFont"), Color.WHITE, Color.DARK_GRAY, Color.LIGHT_GRAY);
+        nextButton.setOnClick(() -> {
+            System.out.println("Next round started!");
+            endRoundMenu.setActive(false);
+        });
+
+        rightPanel.addChild(statsLabel);
+        rightPanel.addChild(nextButton);
+
+        endRoundMenu.addChild(leftPanel);
+        endRoundMenu.addChild(rightPanel);
+        endRoundMenu.setActive(false);
+    }
+
 }

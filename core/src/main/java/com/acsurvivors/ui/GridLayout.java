@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GridLayout implements IUIElement {
+public class GridLayout implements IUIElement, Transformable {
     private final int rows;
     private final int cols;
     private final float elementWidth;
@@ -101,4 +101,19 @@ public class GridLayout implements IUIElement {
             child.setActive(active);
         }
     }
+
+    @Override
+    public void setPosition(float x, float y) {
+        this.x = x;
+        this.y = y;
+        arrange();
+    }
+
+
+    @Override
+    public float getX(){ return this.x;}
+
+    @Override
+    public float getY(){ return this.y;}
 }
+

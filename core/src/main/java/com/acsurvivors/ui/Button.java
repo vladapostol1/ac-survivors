@@ -90,4 +90,11 @@ public class Button implements IUIElement, Transformable {
     public void setActive(boolean active) {
         this.active = active;
     }
+
+
+    @Override
+    public float getX(){ return 1.0f;}
+
+    @Override
+    public float getY(){ return 1.0f;}
 }
