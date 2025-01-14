@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Texture;
 import java.util.HashMap;
 import java.util.Map;
 
+
 public class AssetManager {
     private final Map<String, Texture> textures;
     private final Map<String, Sound> sounds;
@@ -19,46 +20,46 @@ public class AssetManager {
         musicTracks = new HashMap<>();
     }
 
-    public void loadTexture(String path) {
-        if (!textures.containsKey(path)) {
+    public void loadTexture(String name, String path) {
+        if (!textures.containsKey(name)) {
             Texture texture = new Texture(Gdx.files.internal(path));
-            textures.put(path, texture);
+            textures.put(name, texture);
         }
     }
 
-    public void loadSound(String path) {
-        if (!sounds.containsKey(path)) {
+    public Texture getTexture(String name) {
+        if (!textures.containsKey(name)) {
+            throw new IllegalStateException("Texture not loaded: " + name);
+        }
+        return textures.get(name);
+    }
+
+    public void loadSound(String name, String path) {
+        if (!sounds.containsKey(name)) {
             Sound sound = Gdx.audio.newSound(Gdx.files.internal(path));
-            sounds.put(path, sound);
+            sounds.put(name, sound);
         }
     }
 
-    public void loadMusic(String path) {
-        if (!musicTracks.containsKey(path)) {
+    public Sound getSound(String name) {
+        if (!sounds.containsKey(name)) {
+            throw new IllegalStateException("Sound not loaded: " + name);
+        }
+        return sounds.get(name);
+    }
+
+    public void loadMusic(String name, String path) {
+        if (!musicTracks.containsKey(name)) {
             Music music = Gdx.audio.newMusic(Gdx.files.internal(path));
-            musicTracks.put(path, music);
+            musicTracks.put(name, music);
         }
     }
 
-    public Texture getTexture(String path) {
-        if (!textures.containsKey(path)) {
-            throw new IllegalStateException("Texture not loaded: " + path);
+    public Music getMusic(String name) {
+        if (!musicTracks.containsKey(name)) {
+            throw new IllegalStateException("Music not loaded: " + name);
         }
-        return textures.get(path);
-    }
-
-    public Sound getSound(String path) {
-        if (!sounds.containsKey(path)) {
-            throw new IllegalStateException("Sound not loaded: " + path);
-        }
-        return sounds.get(path);
-    }
-
-    public Music getMusic(String path) {
-        if (!musicTracks.containsKey(path)) {
-            throw new IllegalStateException("Music not loaded: " + path);
-        }
-        return musicTracks.get(path);
+        return musicTracks.get(name);
     }
 
     public void dispose() {
@@ -78,10 +79,13 @@ public class AssetManager {
         musicTracks.clear();
     }
 
-    public void loadMapTextures(String... paths) {
-        for (String path : paths) {
-            loadTexture(path + ".png");
+    public void loadMultipleTextures(String[] names, String[] paths) {
+        if (names.length != paths.length) {
+            throw new IllegalArgumentException("Names and paths arrays must have the same length.");
+        }
+
+        for (int i = 0; i < names.length; i++) {
+            loadTexture(names[i], paths[i]);
         }
     }
 }
-

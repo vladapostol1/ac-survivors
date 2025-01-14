@@ -1,4 +1,5 @@
 package com.acsurvivors.utils;
+import com.acsurvivors.entities.components.ColliderComponent;
 import com.badlogic.gdx.Gdx;
 
 import com.acsurvivors.utils.AssetManager;
@@ -37,4 +38,5 @@ public class MapLoader {
 
         return !tile.equals("00");
     }
+
 }

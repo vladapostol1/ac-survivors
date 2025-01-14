@@ -2,12 +2,15 @@ package com.acsurvivors.entities;
 
 import com.acsurvivors.entities.Entity;
 import com.acsurvivors.entities.EntityManager;
+import com.acsurvivors.entities.components.AnimatedSpriteComponent;
 import com.acsurvivors.entities.components.ColliderComponent;
 import com.acsurvivors.entities.components.SpriteComponent;
 import com.acsurvivors.entities.components.TransformComponent;
 import com.acsurvivors.utils.AssetManager;
+import com.acsurvivors.utils.ColliderManager;
 import com.acsurvivors.utils.CustomOrthographicCamera;
 import com.acsurvivors.utils.MapLoader;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 
@@ -50,6 +53,7 @@ public class EnemySpawner {
             spawnX = MathUtils.random(cameraLeft - SPAWN_DISTANCE, cameraRight + SPAWN_DISTANCE);
         }
 
+
         // Cream inamicul
         Entity enemy = entityManager.createEntity();
         TransformComponent transform = new TransformComponent();
@@ -57,17 +61,32 @@ public class EnemySpawner {
         transform.y = spawnY;
         enemy.addComponent(TransformComponent.class, transform);
 
-        SpriteComponent sprite = new SpriteComponent();
-        sprite.texture = assetManager.getTexture("player_idle.png");
-        enemy.addComponent(SpriteComponent.class, sprite);
+        AnimatedSpriteComponent animatedSprite = new AnimatedSpriteComponent();
+        AnimatedSpriteComponent.Animation batAnimation = new AnimatedSpriteComponent.Animation(0.8f);
+        batAnimation.addFrame(new TextureRegion(assetManager.getTexture("Bat_Sprite_Sheet1")));
+        batAnimation.addFrame(new TextureRegion(assetManager.getTexture("Bat_Sprite_Sheet2")));
+        batAnimation.addFrame(new TextureRegion(assetManager.getTexture("Bat_Sprite_Sheet3")));
+        batAnimation.addFrame(new TextureRegion(assetManager.getTexture("Bat_Sprite_Sheet4")));
+        batAnimation.addFrame(new TextureRegion(assetManager.getTexture("Bat_Sprite_Sheet5")));
 
-        ColliderComponent collider = new ColliderComponent(transform.x, transform.y, TILE_SIZE / 2, TILE_SIZE / 2, mapLoader);
+        animatedSprite.addAnimation("bat", batAnimation);
+        animatedSprite.setAnimation("bat");
+
+        //SpriteComponent sprite = new SpriteComponent(new TextureRegion(assetManager.getTexture("Bat_Sprite_Sheet1")));
+        enemy.addComponent(AnimatedSpriteComponent.class, animatedSprite);
+
+        ColliderComponent collider = new ColliderComponent(transform.x, transform.y, TILE_SIZE/2, TILE_SIZE/2);
         enemy.addComponent(ColliderComponent.class, collider);
+        collider.changeOffset(16,16);
         collider.updatePosition(transform.x, transform.y);
+
+
     }
+
+
     private boolean isCollidingWithOtherEnemies(float x, float y) {
         List<Entity> entities = entityManager.getEntities();
-        Rectangle newEnemyBounds = new Rectangle(x, y, TILE_SIZE / 2, TILE_SIZE / 2);
+        Rectangle newEnemyBounds = new Rectangle(x, y, TILE_SIZE, TILE_SIZE);
 
         for (Entity entity : entities) {
             if (entity.hasComponent(ColliderComponent.class)) {
